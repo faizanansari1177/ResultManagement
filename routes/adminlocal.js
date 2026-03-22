@@ -1,28 +1,28 @@
-const express    = require('express');
-const router     = express.Router();
-const multer     = require('multer');
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const Result     = require('../models/Result');
-const Settings   = require('../models/Settings');
+const express = require('express');
+const router  = express.Router();
+const multer  = require('multer');
+const path    = require('path');
+const Result  = require('../models/Result');
 
-// ─── Cloudinary Config ────────────────────────────────────────────────────────
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key:    process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
-// ─── Multer with Cloudinary Storage ──────────────────────────────────────────
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'student-portal',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'],
-    transformation: [{ width: 400, height: 400, crop: 'limit' }]
+// Multer setup - save logo to public/uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, path.join(__dirname, '../public/uploads')),
+  filename: (req, file, cb) => {
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e6);
+    cb(null, unique + path.extname(file.originalname));
   }
 });
-const upload = multer({ storage, limits: { fileSize: 2 * 1024 * 1024 } });
+const upload = multer({
+  storage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+  fileFilter: (req, file, cb) => {
+    const allowed = /jpeg|jpg|png|gif|svg|webp/;
+    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
+    const mime = allowed.test(file.mimetype);
+    if (ext && mime) return cb(null, true);
+    cb(new Error('Only image files are allowed!'));
+  }
+});
 
 const semLabels = {
   'I_II':   { sem1Name: 'I SEMESTER',   sem2Name: 'II SEMESTER'  },
@@ -30,7 +30,6 @@ const semLabels = {
   'V_VI':   { sem1Name: 'V SEMESTER',   sem2Name: 'VI SEMESTER'  }
 };
 
-// ─── Add Result ───────────────────────────────────────────────────────────────
 router.get('/admin/add-result', (req, res) => {
   res.render('admin/add-result', { success: null, error: null });
 });
@@ -45,6 +44,8 @@ router.post('/admin/add-result', upload.single('logoFile'), async (req, res) => 
     } = req.body;
 
     const labels = semLabels[semesterPair] || { sem1Name: 'I SEMESTER', sem2Name: 'II SEMESTER' };
+
+    console.log('💾 Saving result for rollNumber:', rollNumber, '| semesterPair:', semesterPair);
 
     const toArray = val => {
       if (!val) return [];
@@ -69,9 +70,14 @@ router.post('/admin/add-result', upload.single('logoFile'), async (req, res) => 
       total:       toArray(req.body.s2Total)[i]     || '--'
     }));
 
+    // Logo: use newly uploaded, or keep existing, or empty
+    let logoPath = '';
     const existing = await Result.findOne({ rollNumber: rollNumber.trim(), semesterPair });
-    let logoPath = existing ? existing.logoPath || '' : '';
-    if (req.file) logoPath = req.file.path;
+    if (req.file) {
+      logoPath = '/uploads/' + req.file.filename;
+    } else if (existing && existing.logoPath) {
+      logoPath = existing.logoPath;
+    }
 
     const data = {
       enrollmentNo, studentName, fatherName,
@@ -91,6 +97,7 @@ router.post('/admin/add-result', upload.single('logoFile'), async (req, res) => 
     }
 
     await new Result({ rollNumber: rollNumber.trim(), ...data }).save();
+    console.log('✅ Saved successfully!');
     res.render('admin/add-result', { success: '✅ Result added successfully!', error: null });
 
   } catch (err) {
@@ -99,7 +106,11 @@ router.post('/admin/add-result', upload.single('logoFile'), async (req, res) => 
   }
 });
 
-// ─── Settings ─────────────────────────────────────────────────────────────────
+module.exports = router;
+
+// ─── GET Admin Settings ───────────────────────────────────────────────────────
+const Settings = require('../models/Settings');
+
 router.get('/admin/settings', async (req, res) => {
   const raw = await Settings.findOne().lean() || {};
   const settings = { siteLogo: raw.siteLogo || '', universityName: raw.universityName || '' };
@@ -108,16 +119,30 @@ router.get('/admin/settings', async (req, res) => {
 
 router.post('/admin/settings', upload.single('siteLogo'), async (req, res) => {
   try {
+    console.log('📝 req.body:', req.body);
+    console.log('📁 req.file:', req.file);
+
+    // Get existing settings first
     let settings = await Settings.findOne();
     if (!settings) settings = new Settings();
 
+    // Always update universityName from form
     settings.universityName = req.body.universityName || '';
-    if (req.file) settings.siteLogo = req.file.path;
+
+    // Only update logo if new file uploaded
+    if (req.file) {
+      settings.siteLogo = '/uploads/' + req.file.filename;
+    }
 
     await settings.save();
+    console.log('✅ Settings saved:', settings.toObject());
 
     const saved = { siteLogo: settings.siteLogo || '', universityName: settings.universityName || '' };
-    res.render('admin/settings', { success: '✅ Settings updated!', error: null, settings: saved });
+    res.render('admin/settings', {
+      success: '✅ Settings updated successfully!',
+      error: null,
+      settings: saved
+    });
   } catch (err) {
     console.error('❌ Settings error:', err.message);
     const raw = await Settings.findOne().lean() || {};
@@ -125,5 +150,3 @@ router.post('/admin/settings', upload.single('siteLogo'), async (req, res) => {
     res.render('admin/settings', { success: null, error: 'Something went wrong: ' + err.message, settings });
   }
 });
-
-module.exports = router;
