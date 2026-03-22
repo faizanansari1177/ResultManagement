@@ -64,10 +64,33 @@
     .empty { text-align: center; padding: 3rem; color: #aaa; font-size: 0.95rem; }
     .count { padding: 0.6rem 1.5rem; font-size: 0.82rem; color: #888; border-top: 1px solid #eee; }
 
+
+    /* RESPONSIVE */
     @media (max-width: 768px) {
-      th:nth-child(4), td:nth-child(4) { display: none; }
+      body { padding: 1rem 0.5rem; }
       .page-header { flex-direction: column; align-items: flex-start; }
+      .card { border-radius: 10px; }
+
+      /* Hide course column on mobile */
+      th:nth-child(4), td:nth-child(4) { display: none; }
+
+      /* Make table scroll horizontally */
+      .card { overflow-x: auto; }
+      table { min-width: 500px; }
+      th, td { padding: 0.6rem 0.7rem; font-size: 0.78rem; }
+
+      .nav-links { width: 100%; }
+      .nav-link { flex: 1; text-align: center; font-size: 0.8rem; padding: 0.45rem 0.5rem; }
+      .btn-edit, .btn-delete { padding: 0.3rem 0.5rem; font-size: 0.75rem; }
+      .page-header h1 { font-size: 1.2rem; }
     }
+
+    @media (max-width: 480px) {
+      /* Also hide semester on very small screens */
+      th:nth-child(3), td:nth-child(3) { display: none; }
+      table { min-width: 380px; }
+    }
+
   </style>
 </head>
 <body>
