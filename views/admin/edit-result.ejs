@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Result - Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fb; min-height: 100vh; padding: 2rem 1rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .page-header { margin-bottom: 1.5rem; }
+    .page-header h1 { color: #333; font-size: 1.5rem; }
+    .page-header p { color: #888; font-size: 0.9rem; margin-top: 0.3rem; }
+    .card { background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 1.5rem; margin-bottom: 1.5rem; }
+    .card-title { font-size: 0.95rem; font-weight: 700; color: #444; border-left: 4px solid #1a6fc4; padding-left: 0.7rem; margin-bottom: 1.2rem; }
+    .form-group { margin-bottom: 0.9rem; }
+    label { display: block; margin-bottom: 0.25rem; color: #555; font-size: 0.82rem; font-weight: 600; }
+    input, select { width: 100%; padding: 0.55rem 0.8rem; border: 1.5px solid #e0e0e0; border-radius: 6px; font-size: 0.88rem; background: white; }
+    input:focus, select:focus { outline: none; border-color: #1a6fc4; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; }
+    .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.8rem; }
+    .semesters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .sem-panel { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 10px; padding: 1rem; }
+    .sem-title { font-weight: 700; font-size: 0.85rem; color: #1a6fc4; margin-bottom: 0.8rem; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+    .sub-header { display: grid; grid-template-columns: 90px 55px 65px 55px 65px 55px 32px; gap: 3px; margin-bottom: 4px; }
+    .sub-header span { font-size: 0.68rem; color: #fff; font-weight: 700; text-align: center; padding: 2px 3px; border-radius: 3px; background: #1a6fc4; }
+    .sub-header span:first-child { background: #555; }
+    .sub-row { display: grid; grid-template-columns: 90px 55px 65px 55px 65px 55px 32px; gap: 3px; margin-bottom: 4px; align-items: center; }
+    .sub-row input { padding: 0.38rem 0.3rem; font-size: 0.78rem; text-align: center; }
+    .sub-row input:first-child { text-align: left; }
+    .remove-btn { background: #ffe0e0; color: #e53935; border: none; border-radius: 4px; width: 32px; height: 30px; cursor: pointer; font-size: 0.9rem; font-weight: 700; }
+    .remove-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .add-btn { background: #f0f4ff; color: #1a6fc4; border: 1.5px dashed #1a6fc4; border-radius: 6px; padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; width: 100%; margin-top: 0.3rem; }
+    .submit-btn { width: 100%; padding: 0.9rem; background: #1a6fc4; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; }
+    .submit-btn:hover { background: #1455a0; }
+    .alert { padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 1.2rem; font-size: 0.9rem; }
+    .alert-success { background: #f0fff4; color: #27ae60; border-left: 4px solid #27ae60; }
+    .alert-error { background: #fff0f0; color: #e53935; border-left: 4px solid #e53935; }
+    .back-link { display: inline-block; margin-bottom: 1rem; color: #1a6fc4; text-decoration: none; font-size: 0.88rem; font-weight: 600; }
+    .back-link:hover { text-decoration: underline; }
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4, .semesters-grid { grid-template-columns: 1fr; }
+      .sem-panel { overflow-x: auto; }
+      .sub-header, .sub-row { min-width: 420px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a href="/admin/results" class="back-link">← Back to All Results</a>
+
+  <div class="page-header">
+    <h1>✏️ Edit Result</h1>
+    <p>Editing result for <strong><%= result.studentName %></strong> — Roll: <%= result.rollNumber %></p>
+  </div>
+
+  <% if (success) { %><div class="alert alert-success"><%= success %></div><% } %>
+  <% if (error) { %><div class="alert alert-error">⚠️ <%= error %></div><% } %>
+
+  <form method="POST" action="/admin/edit-result/<%= result._id %>" enctype="multipart/form-data">
+
+    <div class="card">
+      <div class="card-title">👤 Student Information</div>
+      <div class="grid-2">
+        <div class="form-group"><label>Student Name</label><input type="text" name="studentName" value="<%= result.studentName %>" required></div>
+        <div class="form-group"><label>Father's Name</label><input type="text" name="fatherName" value="<%= result.fatherName %>" required></div>
+      </div>
+      <div class="grid-3">
+        <div class="form-group"><label>Roll Number (read only)</label><input type="text" value="<%= result.rollNumber %>" disabled style="background:#f5f5f5;"></div>
+        <div class="form-group"><label>Enrollment Number</label><input type="text" name="enrollmentNo" value="<%= result.enrollmentNo %>" required></div>
+        <div class="form-group"><label>Status</label><input type="text" name="studentStatus" value="<%= result.studentStatus %>"></div>
+      </div>
+      <div class="form-group"><label>Course</label><input type="text" name="course" value="<%= result.course %>" required></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📚 Semester</div>
+      <div class="form-group">
+        <label>Semester Pair</label>
+        <select name="semesterPair" id="semesterPair" required onchange="setSemLabels(this.value)">
+          <option value="I_II"   <%= result.semesterPair === 'I_II'   ? 'selected' : '' %>>I / II Semester</option>
+          <option value="III_IV" <%= result.semesterPair === 'III_IV' ? 'selected' : '' %>>III / IV Semester</option>
+          <option value="V_VI"   <%= result.semesterPair === 'V_VI'   ? 'selected' : '' %>>V / VI Semester</option>
+        </select>
+        <input type="hidden" name="sem1Name" id="sem1Name" value="<%= result.sem1Name %>">
+        <input type="hidden" name="sem2Name" id="sem2Name" value="<%= result.sem2Name %>">
+      </div>
+    </div>
+
+    <div class="semesters-grid">
+      <div class="sem-panel">
+        <div class="sem-title">Semester 1 Subjects</div>
+        <div class="sub-header">
+          <span>Sub Code</span><span>Ext.MM</span><span>Ext.Marks</span><span>Sess.MM</span><span>Sess.Marks</span><span>Total</span><span></span>
+        </div>
+        <div id="sem1-container">
+          <% result.sem1Subjects.forEach(function(sub) { %>
+          <div class="sub-row">
+            <input type="text" name="s1Code"      value="<%= sub.subjectCode %>">
+            <input type="text" name="s1ExtMM"     value="<%= sub.extMM %>">
+            <input type="text" name="s1ExtMarks"  value="<%= sub.extMarks %>">
+            <input type="text" name="s1SessMM"    value="<%= sub.sessMM %>">
+            <input type="text" name="s1SessMarks" value="<%= sub.sessMarks %>">
+            <input type="text" name="s1Total"     value="<%= sub.total %>">
+            <button type="button" class="remove-btn" onclick="removeRow(this,'sem1-container')">×</button>
+          </div>
+          <% }); %>
+        </div>
+        <button type="button" class="add-btn" onclick="addRow('sem1-container','s1')">+ Add Row</button>
+      </div>
+
+      <div class="sem-panel">
+        <div class="sem-title">Semester 2 Subjects</div>
+        <div class="sub-header">
+          <span>Sub Code</span><span>Ext.MM</span><span>Ext.Marks</span><span>Sess.MM</span><span>Sess.Marks</span><span>Total</span><span></span>
+        </div>
+        <div id="sem2-container">
+          <% result.sem2Subjects.forEach(function(sub) { %>
+          <div class="sub-row">
+            <input type="text" name="s2Code"      value="<%= sub.subjectCode %>">
+            <input type="text" name="s2ExtMM"     value="<%= sub.extMM %>">
+            <input type="text" name="s2ExtMarks"  value="<%= sub.extMarks %>">
+            <input type="text" name="s2SessMM"    value="<%= sub.sessMM %>">
+            <input type="text" name="s2SessMarks" value="<%= sub.sessMarks %>">
+            <input type="text" name="s2Total"     value="<%= sub.total %>">
+            <button type="button" class="remove-btn" onclick="removeRow(this,'sem2-container')">×</button>
+          </div>
+          <% }); %>
+        </div>
+        <button type="button" class="add-btn" onclick="addRow('sem2-container','s2')">+ Add Row</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1rem;">
+      <div class="card-title">📋 Summary & Result</div>
+      <div class="grid-2">
+        <div class="form-group"><label>Carry Over Paper(s)</label><input type="text" name="carryOverPapers" value="<%= result.carryOverPapers %>"></div>
+        <div class="form-group"><label>Year Label</label><input type="text" name="yearLabel" value="<%= result.yearLabel %>"></div>
+      </div>
+      <div class="grid-4">
+        <div class="form-group"><label>Maximum Marks</label><input type="text" name="maximumMarks" value="<%= result.maximumMarks %>" required></div>
+        <div class="form-group"><label>Marks Obtained</label><input type="text" name="marksObtain" value="<%= result.marksObtain %>" required></div>
+        <div class="form-group">
+          <label>Result</label>
+          <select name="result" required>
+            <option value="PASS"        <%= result.result === 'PASS'        ? 'selected' : '' %>>PASS</option>
+            <option value="FAIL"        <%= result.result === 'FAIL'        ? 'selected' : '' %>>FAIL</option>
+            <option value="COMPARTMENT" <%= result.result === 'COMPARTMENT' ? 'selected' : '' %>>COMPARTMENT</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Date of Declaration</label><input type="text" name="dateOfDeclaration" value="<%= result.dateOfDeclaration %>" required></div>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn">💾 Save Changes</button>
+  </form>
+</div>
+
+<script>
+function addRow(containerId, prefix) {
+  const c = document.getElementById(containerId);
+  const d = document.createElement('div');
+  d.className = 'sub-row';
+  d.innerHTML = `
+    <input type="text" name="${prefix}Code"      placeholder="Code">
+    <input type="text" name="${prefix}ExtMM"     placeholder="70">
+    <input type="text" name="${prefix}ExtMarks"  placeholder="0">
+    <input type="text" name="${prefix}SessMM"    placeholder="30">
+    <input type="text" name="${prefix}SessMarks" placeholder="0">
+    <input type="text" name="${prefix}Total"     placeholder="0">
+    <button type="button" class="remove-btn" onclick="removeRow(this,'${containerId}')">×</button>
+  `;
+  c.appendChild(d);
+  updateBtns(containerId);
+}
+function removeRow(btn, containerId) {
+  btn.closest('.sub-row').remove();
+  updateBtns(containerId);
+}
+function updateBtns(containerId) {
+  const rows = document.querySelectorAll('#' + containerId + ' .sub-row');
+  rows.forEach(r => r.querySelector('.remove-btn').disabled = rows.length === 1);
+}
+function setSemLabels(val) {
+  const map = {
+    'I_II':   ['I SEMESTER',   'II SEMESTER'],
+    'III_IV': ['III SEMESTER', 'IV SEMESTER'],
+    'V_VI':   ['V SEMESTER',   'VI SEMESTER']
+  };
+  if (map[val]) {
+    document.getElementById('sem1Name').value = map[val][0];
+    document.getElementById('sem2Name').value = map[val][1];
+  }
+}
+</script>
+</body>
+</html>

@@ -11,7 +11,7 @@
     .page { max-width: 1000px; margin: 0 auto; background: white; border: 1px solid #aaa; }
 
     /* BANNER */
-    .top-banner { background: #8b0000; display: flex; align-items: center; justify-content: center; padding: 0.6rem 1rem; min-height: 110px; }
+    .top-banner { background: #ffffff; display: flex; align-items: center; justify-content: center; padding: 0.6rem 1rem; min-height: 110px; }
     .logo-box { background: white; border: 2px solid #ccc; padding: 0.5rem 1.2rem; text-align: center; display: inline-flex; flex-direction: column; align-items: center; min-width: 220px; }
     .logo-icon { display: block; margin-bottom: 0.2rem; }
     .logo-name { font-size: 2rem; font-weight: 900; color: #1a3a8f; letter-spacing: 2px; text-transform: uppercase; line-height: 1.1; font-family: Arial Black, Arial, sans-serif; }
@@ -133,8 +133,8 @@
     <div class="info-row"><span class="info-lbl">Father's Name</span><span class="info-colon">:</span><span class="info-val"><strong><%= result.fatherName %></strong></span></div>
     <div class="info-row"><span class="info-lbl">Roll Number</span><span class="info-colon">:</span><span class="info-val"><strong><%= result.rollNumber %></strong></span></div>
     <div class="info-row"><span class="info-lbl">Enrolment Number</span><span class="info-colon">:</span><span class="info-val"><strong><%= result.enrollmentNo %></strong></span></div>
-    <div class="info-row"><span class="info-lbl">Status</span><span class="info-colon">:</span><span class="info-val"><%= result.studentStatus %></span></div>
-    <div class="info-row"><span class="info-lbl">Institute</span><span class="info-colon">:</span><span class="info-val"><%= settings.universityName || "" %></span></div>
+    <b><div class="info-row"><span class="info-lbl">Status</span><span class="info-colon">:</span><span class="info-val"><%= result.studentStatus %></span></div></b>
+    <b><div class="info-row"><span class="info-lbl">Institute</span><span class="info-colon">:</span><span class="info-val"><%= settings.universityName || "" %></span></div></b>
   </div>
 
   <!-- MARKS DETAIL -->
