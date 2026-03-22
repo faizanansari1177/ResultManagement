@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statement of Marks</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #ccc; padding: 1rem; }
+
+    .page { max-width: 1000px; margin: 0 auto; background: white; border: 1px solid #aaa; }
+
+    /* BANNER */
+    .top-banner { background: #8b0000; display: flex; align-items: center; justify-content: center; padding: 0.6rem 1rem; min-height: 110px; }
+    .logo-box { background: white; border: 2px solid #ccc; padding: 0.5rem 1.2rem; text-align: center; display: inline-flex; flex-direction: column; align-items: center; min-width: 220px; }
+    .logo-icon { display: block; margin-bottom: 0.2rem; }
+    .logo-name { font-size: 2rem; font-weight: 900; color: #1a3a8f; letter-spacing: 2px; text-transform: uppercase; line-height: 1.1; font-family: Arial Black, Arial, sans-serif; }
+    .logo-sub { font-size: 0.72rem; font-weight: 900; color: #e53935; letter-spacing: 3px; text-transform: uppercase; }
+    .logo-tagline { font-size: 0.55rem; color: #555; margin-top: 0.15rem; text-align: center; }
+
+    /* COURSE */
+    .course-line { font-size: 0.85rem; font-weight: 600; color: #111; padding: 0.5rem 1.5rem 0.3rem; font-style: italic; }
+
+    /* STUDENT INFO */
+    .student-section { padding: 0.2rem 1.5rem 0.5rem; }
+    .info-row { display: flex; align-items: baseline; font-size: 0.85rem; padding: 0.1rem 0; }
+    .info-lbl { font-weight: 700; color: #111; min-width: 170px; }
+    .info-colon { margin: 0 0.5rem 0 0; color: #111; }
+    .info-val { color: #111; }
+
+    /* MARKS HEADING */
+    .marks-heading { text-align: center; font-weight: 700; font-size: 0.9rem; padding: 0.5rem; text-decoration: underline; color: #111; letter-spacing: 1px; }
+
+    /* SCROLLABLE WRAPPER - wraps sem labels + table together */
+    .table-scroll-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    /* SEMESTER LABELS */
+    .sem-labels { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #555; min-width: 620px; }
+    .sem-label { text-align: center; font-weight: 700; font-size: 0.82rem; padding: 0.25rem; color: #111; border-right: 1px solid #555; }
+    .sem-label:last-child { border-right: none; }
+
+    /* MARKS TABLE */
+    .marks-table-wrapper { border-top: 1px solid #555; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 620px; }
+    th, td { border: 1px solid #555; padding: 0.25rem 0.4rem; color: #111; }
+    thead th { background: white; font-weight: 700; text-align: center; font-size: 0.75rem; }
+    tbody td { text-align: left; }
+    tbody td:nth-child(2), tbody td:nth-child(3), tbody td:nth-child(4),
+    tbody td:nth-child(5), tbody td:nth-child(6),
+    tbody td:nth-child(8), tbody td:nth-child(9), tbody td:nth-child(10),
+    tbody td:nth-child(11), tbody td:nth-child(12) { text-align: center; }
+
+    /* CARRY OVER */
+    .carry-over { padding: 0.35rem 1rem; font-size: 0.82rem; color: #111; border-top: 1px solid #aaa; }
+
+    /* SUMMARY */
+    .summary-section { padding: 0.3rem 1rem 0.2rem; overflow-x: auto; }
+    .summary-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 300px; }
+    .summary-table th { font-weight: 700; color: #111; padding: 0.2rem 1rem 0.1rem; text-align: left; }
+    .summary-table td { color: #111; padding: 0.15rem 1rem; text-align: left; }
+
+    /* DATE */
+    .date-line { padding: 0.3rem 1rem 0.5rem; font-size: 0.82rem; color: #111; }
+    .date-line span { font-weight: 700; min-width: 180px; display: inline-block; }
+
+    /* NOTES */
+    .notes-section { border-top: 1px solid #aaa; padding: 0.6rem 1.5rem 1rem; font-size: 0.78rem; color: #111; }
+    .notes-section .note-title { font-weight: 700; margin-bottom: 0.3rem; font-size: 0.8rem; }
+    .notes-section ul { padding-left: 1.2rem; }
+    .notes-section ul li { margin-bottom: 0.2rem; line-height: 1.4; }
+    .notes-section .red { color: #cc0000; font-weight: 700; }
+
+    /* ACTION BUTTONS */
+    .actions { max-width: 1000px; margin: 1rem auto 0; display: flex; gap: 1rem; }
+    .btn { flex: 1; padding: 0.75rem; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; border: none; font-family: Arial, sans-serif; }
+    .btn-print  { background: #8b0000; color: white; }
+    .btn-search { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+    .btn-back   { background: #f0f0f0; color: #444; }
+    .btn:hover  { opacity: 0.88; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      body { padding: 0.3rem; }
+      .top-banner { padding: 0.4rem 0.5rem; min-height: 70px; }
+      .logo-box { min-width: 150px; padding: 0.3rem 0.6rem; }
+      .logo-name { font-size: 1.2rem; letter-spacing: 1px; }
+      .logo-sub { font-size: 0.55rem; letter-spacing: 1px; }
+      .logo-tagline { font-size: 0.48rem; }
+      .course-line { font-size: 0.73rem; padding: 0.35rem 0.7rem; }
+      .student-section { padding: 0.2rem 0.7rem 0.4rem; }
+      .info-lbl { min-width: 110px; font-size: 0.75rem; }
+      .info-val { font-size: 0.75rem; }
+      .marks-heading { font-size: 0.78rem; }
+      .carry-over { font-size: 0.72rem; padding: 0.3rem 0.7rem; }
+      .summary-table th, .summary-table td { font-size: 0.72rem; padding: 0.2rem 0.4rem; }
+      .date-line { font-size: 0.72rem; padding: 0.3rem 0.7rem; }
+      .notes-section { padding: 0.4rem 0.7rem 0.7rem; font-size: 0.68rem; }
+      .actions { flex-direction: column; gap: 0.5rem; }
+      .btn { font-size: 0.85rem; padding: 0.65rem; }
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .actions { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- BANNER -->
+  <div class="top-banner">
+    <div class="logo-box">
+      <% var logoSrc = settings.siteLogo || result.logoPath || ''; %>
+      <% if (logoSrc) { %>
+        <img src="<%= logoSrc %>" alt="College Logo" style="max-height:90px; max-width:200px; object-fit:contain;">
+      <% } else { %>
+        <div style="width:90px; height:90px; background:white; border:2px solid #ddd; border-radius:8px;"></div>
+      <% } %>
+      <!-- <% if (settings.universityName) { %>
+        <div style="font-size:1rem; font-weight:900; color:#1a3a8f; margin-top:0.3rem; text-align:center; letter-spacing:1px;"><%= settings.universityName %></div>
+      <% } %> -->
+    </div>
+  </div>
+
+  <!-- COURSE -->
+  <div class="course-line"><%= result.course %></div>
+
+  <!-- STUDENT INFO -->
+  <div class="student-section">
+    <div class="info-row"><span class="info-lbl">Name</span><span class="info-colon">:</span><span class="info-val"><strong><%= result.studentName %></strong></span></div>
+    <div class="info-row"><span class="info-lbl">Father's Name</span><span class="info-colon">:</span><span class="info-val"><strong><%= result.fatherName %></strong></span></div>
+    <div class="info-row"><span class="info-lbl">Roll Number</span><span class="info-colon">:</span><span class="info-val"><strong><%= result.rollNumber %></strong></span></div>
+    <div class="info-row"><span class="info-lbl">Enrolment Number</span><span class="info-colon">:</span><span class="info-val"><strong><%= result.enrollmentNo %></strong></span></div>
+    <div class="info-row"><span class="info-lbl">Status</span><span class="info-colon">:</span><span class="info-val"><%= result.studentStatus %></span></div>
+    <div class="info-row"><span class="info-lbl">Institute</span><span class="info-colon">:</span><span class="info-val"><%= settings.universityName || "" %></span></div>
+  </div>
+
+  <!-- MARKS DETAIL -->
+  <div class="marks-heading">MARKS DETAIL</div>
+
+  <!-- SCROLLABLE WRAPPER — sem labels + table scroll together -->
+  <div class="table-scroll-wrapper">
+    <div class="sem-labels">
+      <div class="sem-label"><%= result.sem1Name %></div>
+      <div class="sem-label"><%= result.sem2Name %></div>
+    </div>
+    <div class="marks-table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:80px;">Subject Code</th>
+            <th>Ext. MM</th><th>Ext. Marks</th><th>Sess. MM</th><th>Sess. Marks</th><th>Total</th>
+            <th style="width:80px;">Subject Code</th>
+            <th>Ext. MM</th><th>Ext. Marks</th><th>Sess. MM</th><th>Sess. Marks</th><th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% result.sem1Subjects.forEach(function(s1, i) {
+               var s2 = result.sem2Subjects[i] || {}; %>
+          <tr>
+            <td><%= s1.subjectCode || '' %></td>
+            <td><%= s1.extMM      || '' %></td>
+            <td><%= s1.extMarks   || '' %></td>
+            <td><%= s1.sessMM     || '' %></td>
+            <td><%= s1.sessMarks  || '' %></td>
+            <td><%= s1.total      || '' %></td>
+            <td><%= s2.subjectCode || '' %></td>
+            <td><%= s2.extMM      || '' %></td>
+            <td><%= s2.extMarks   || '' %></td>
+            <td><%= s2.sessMM     || '' %></td>
+            <td><%= s2.sessMarks  || '' %></td>
+            <td><%= s2.total      || '' %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CARRY OVER -->
+  <div class="carry-over">Carry Over Paper(s) &nbsp;: &nbsp;<%= result.carryOverPapers || '' %></div>
+
+  <!-- SUMMARY -->
+  <div class="summary-section">
+    <table class="summary-table">
+      <thead><tr><th>Year</th><th>Maximum Marks</th><th>Marks Obtain</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><%= result.yearLabel %></td>
+          <td><%= result.maximumMarks %></td>
+          <td><%= result.marksObtain %></td>
+          <td><strong><%= result.result %></strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DATE -->
+  <div class="date-line"><span>Date of Declaration:</span> &nbsp;<%= result.dateOfDeclaration %></div>
+
+  <!-- NOTES -->
+  <div class="notes-section">
+    <p class="note-title">Note : from the academic year 2011-12 marks system is adopted in place of grade system .</p>
+    <ul>
+      <li>For Further clarification contact respective Head of Departments or Controller of Examinations</li>
+      <li><%= settings.universityName || "The University" %> does not own for the errors or omissions, if any, in this statement.</li>
+      <li><span class="red">*</span>The minimum marks to qualify in a paper is 60% in Ph.D. coursework.</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- BUTTONS -->
+<div class="actions">
+  <button onclick="window.print()" class="btn btn-print">🖨 Print</button>
+  <a href="/result" class="btn btn-search">🔍 Search Again</a>
+  <a href="/dashboard" class="btn btn-back">🏠 Dashboard</a>
+</div>
+
+</body>
+</html>

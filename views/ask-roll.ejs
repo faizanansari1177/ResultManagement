@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check Result - Student Portal</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f6fb;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+    .card {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .icon { font-size: 3rem; margin-bottom: 0.5rem; }
+    h2 { color: #333; font-size: 1.4rem; margin-bottom: 0.5rem; }
+    p { color: #888; font-size: 0.9rem; margin-bottom: 1.8rem; }
+    .form-group { margin-bottom: 1rem; text-align: left; }
+    label { display: block; margin-bottom: 0.3rem; color: #555; font-size: 0.88rem; font-weight: 600; }
+    input, select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+      background: white;
+      color: #333;
+    }
+    input:focus, select:focus { outline: none; border-color: #11998e; }
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    .error {
+      background: #fff0f0;
+      color: #e53935;
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.2rem;
+      font-size: 0.88rem;
+      border-left: 4px solid #e53935;
+      text-align: left;
+    }
+    .back { display: block; margin-top: 1.2rem; color: #667eea; text-decoration: none; font-size: 0.9rem; }
+    .back:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">📋</div>
+    <h2>Check Result</h2>
+    <p>Enter your roll number and select semester</p>
+
+    <% if (error) { %>
+      <div class="error">⚠️ <%= error %></div>
+    <% } %>
+
+    <form method="POST" action="/result">
+      <div class="form-group">
+        <label>Roll Number</label>
+        <input type="text" name="rollNumber" placeholder="e.g. 1410302007" required autofocus>
+      </div>
+      <div class="form-group">
+        <label>Select Semester</label>
+        <select name="semester" required>
+          <option value="">-- Select Semester --</option>
+          <option value="I_II">I / II Semester</option>
+          <option value="III_IV">III / IV Semester</option>
+          <option value="V_VI">V / VI Semester</option>
+        </select>
+      </div>
+      <button type="submit">Get Result →</button>
+    </form>
+
+    <a href="/dashboard" class="back">← Back to Dashboard</a>
+  </div>
+</body>
+</html>

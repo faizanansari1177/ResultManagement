@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Site Settings</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fb; min-height: 100vh; padding: 2rem 1rem; }
+    .container { max-width: 520px; margin: 0 auto; }
+    .page-header { margin-bottom: 1.5rem; }
+    .page-header h1 { color: #333; font-size: 1.5rem; }
+    .page-header p { color: #888; font-size: 0.9rem; margin-top: 0.3rem; }
+    .card { background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 2rem; margin-bottom: 1.5rem; }
+    .card-title { font-size: 0.95rem; font-weight: 700; color: #444; border-left: 4px solid #8b0000; padding-left: 0.7rem; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1.2rem; }
+    label { display: block; margin-bottom: 0.3rem; color: #555; font-size: 0.85rem; font-weight: 600; }
+    input[type="text"] { width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 0.92rem; }
+    input[type="text"]:focus { outline: none; border-color: #8b0000; }
+
+    .preview-box {
+      width: 120px; height: 120px;
+      border: 2px dashed #ccc; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      background: #fafafa; overflow: hidden; margin-bottom: 1rem;
+    }
+    .preview-box img { width: 100%; height: 100%; object-fit: contain; }
+    .preview-box .empty { font-size: 0.72rem; color: #aaa; text-align: center; padding: 0.5rem; }
+    .upload-label {
+      display: inline-block; padding: 0.6rem 1.2rem;
+      background: #fff0f0; color: #8b0000;
+      border: 1.5px solid #8b0000; border-radius: 6px;
+      cursor: pointer; font-size: 0.88rem; font-weight: 600; margin-bottom: 0.5rem;
+    }
+    .upload-label:hover { background: #ffe0e0; }
+    #siteLogoInput { display: none; }
+    .hint { font-size: 0.75rem; color: #888; margin-top: 0.4rem; line-height: 1.5; }
+    .submit-btn { width: 100%; padding: 0.85rem; background: #8b0000; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; }
+    .submit-btn:hover { background: #6b0000; }
+    .alert { padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 1.2rem; font-size: 0.9rem; }
+    .alert-success { background: #f0fff4; color: #27ae60; border-left: 4px solid #27ae60; }
+    .alert-error   { background: #fff0f0; color: #e53935; border-left: 4px solid #e53935; }
+    .back-link { display: inline-block; margin-top: 1rem; color: #8b0000; text-decoration: none; font-size: 0.88rem; font-weight: 600; }
+    .back-link:hover { text-decoration: underline; }
+    .divider { border: none; border-top: 1px solid #eee; margin: 1.3rem 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <h1>⚙️ Site Settings</h1>
+      <p>Changes here apply to both the login page and marksheet</p>
+    </div>
+
+    <% if (success) { %><div class="alert alert-success"><%= success %></div><% } %>
+    <% if (error) { %><div class="alert alert-error">⚠️ <%= error %></div><% } %>
+
+    <div class="card">
+      <div class="card-title">🏫 University / College Details</div>
+
+      <form method="POST" action="/admin/settings" enctype="multipart/form-data">
+
+        <!-- University Name -->
+        <div class="form-group">
+          <label>University / College Name</label>
+          <input type="text" name="universityName" placeholder="e.g. Invertis University Bareilly" value="<%= settings.universityName || '' %>">
+          <p class="hint">This name appears on the login page header and result marksheet.</p>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Logo Upload -->
+        <label style="font-size:0.85rem; font-weight:600; color:#555; margin-bottom:0.5rem; display:block;">College Logo</label>
+        <div class="preview-box" id="previewBox">
+          <% if (settings.siteLogo) { %>
+            <img src="<%= settings.siteLogo %>" alt="Current Logo">
+          <% } else { %>
+            <div class="empty">No logo<br>uploaded yet</div>
+          <% } %>
+        </div>
+
+        <label class="upload-label" for="siteLogoInput">📤 Choose Logo Image</label>
+        <input type="file" name="siteLogo" id="siteLogoInput" accept="image/*" onchange="previewSiteLogo(this)">
+        <p class="hint">Accepted: PNG, JPG, SVG, WebP — Max 2MB<br>Logo appears on login page and marksheet header.</p>
+
+        <button type="submit" class="submit-btn">💾 Save Settings</button>
+      </form>
+    </div>
+
+    <a href="/admin/add-result" class="back-link">← Back to Add Result</a>
+  </div>
+
+  <script>
+    function previewSiteLogo(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('previewBox').innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+  </script>
+</body>
+</html>
