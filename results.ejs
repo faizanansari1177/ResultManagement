@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Results - Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fb; min-height: 100vh; padding: 2rem 1rem; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .page-header { margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .page-header h1 { color: #333; font-size: 1.5rem; }
+    .nav-links { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .nav-link { padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+    .nav-link.add { background: #8b0000; color: white; }
+    .nav-link.settings { background: #f0f0f0; color: #444; }
+    .nav-link:hover { opacity: 0.85; }
+
+    .card { background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
+
+    .search-bar { padding: 1rem 1.5rem; border-bottom: 1px solid #eee; }
+    .search-bar input {
+      width: 100%; padding: 0.6rem 1rem;
+      border: 1.5px solid #e0e0e0; border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .search-bar input:focus { outline: none; border-color: #8b0000; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #8b0000; }
+    th { color: white; padding: 0.75rem 1rem; text-align: left; font-size: 0.82rem; font-weight: 600; }
+    td { padding: 0.75rem 1rem; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; color: #333; }
+    tbody tr:hover td { background: #fff8f8; }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-block; padding: 0.2rem 0.6rem;
+      border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+    }
+    .badge-pass { background: #d4edda; color: #155724; }
+    .badge-fail { background: #f8d7da; color: #721c24; }
+    .badge-other { background: #fff3cd; color: #856404; }
+
+    .sem-badge {
+      display: inline-block; padding: 0.15rem 0.5rem;
+      background: #f0f4ff; color: #1a3a8f;
+      border-radius: 4px; font-size: 0.72rem; font-weight: 600;
+    }
+
+    .actions { display: flex; gap: 0.4rem; }
+    .btn-edit {
+      padding: 0.35rem 0.8rem; background: #e8f4fd; color: #1a6fc4;
+      border: none; border-radius: 6px; font-size: 0.8rem;
+      font-weight: 600; cursor: pointer; text-decoration: none;
+    }
+    .btn-edit:hover { background: #d0eaf8; }
+    .btn-delete {
+      padding: 0.35rem 0.8rem; background: #ffe0e0; color: #e53935;
+      border: none; border-radius: 6px; font-size: 0.8rem;
+      font-weight: 600; cursor: pointer;
+    }
+    .btn-delete:hover { background: #ffcccc; }
+
+    .empty { text-align: center; padding: 3rem; color: #aaa; font-size: 0.95rem; }
+    .count { padding: 0.6rem 1.5rem; font-size: 0.82rem; color: #888; border-top: 1px solid #eee; }
+
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      body { padding: 1rem 0.5rem; }
+      .page-header { flex-direction: column; align-items: flex-start; }
+      .card { border-radius: 10px; }
+
+      /* Hide course column on mobile */
+      th:nth-child(4), td:nth-child(4) { display: none; }
+
+      /* Make table scroll horizontally */
+      .card { overflow-x: auto; }
+      table { min-width: 500px; }
+      th, td { padding: 0.6rem 0.7rem; font-size: 0.78rem; }
+
+      .nav-links { width: 100%; }
+      .nav-link { flex: 1; text-align: center; font-size: 0.8rem; padding: 0.45rem 0.5rem; }
+      .btn-edit, .btn-delete { padding: 0.3rem 0.5rem; font-size: 0.75rem; }
+      .page-header h1 { font-size: 1.2rem; }
+    }
+
+    @media (max-width: 480px) {
+      /* Also hide semester on very small screens */
+      th:nth-child(3), td:nth-child(3) { display: none; }
+      table { min-width: 380px; }
+    }
+
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="page-header">
+    <h1>📋 All Results</h1>
+    <div class="nav-links">
+      <a href="/admin/add-result" class="nav-link add">➕ Add New Result</a>
+      <a href="/admin/settings" class="nav-link settings">⚙️ Settings</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="🔍 Search by name, roll number or semester..." onkeyup="filterTable()">
+    </div>
+
+    <% if (results.length === 0) { %>
+      <div class="empty">No results found. <a href="/admin/add-result" style="color:#8b0000;">Add first result →</a></div>
+    <% } else { %>
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Roll Number</th>
+            <th>Semester</th>
+            <th>Course</th>
+            <th>Result</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% results.forEach(function(r) { %>
+          <tr>
+            <td><strong><%= r.studentName %></strong></td>
+            <td><%= r.rollNumber %></td>
+            <td>
+              <span class="sem-badge">
+                <%= r.semesterPair === 'I_II' ? 'I / II' : r.semesterPair === 'III_IV' ? 'III / IV' : 'V / VI' %>
+              </span>
+            </td>
+            <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><%= r.course %></td>
+            <td>
+              <span class="badge <%= r.result === 'PASS' ? 'badge-pass' : r.result === 'FAIL' ? 'badge-fail' : 'badge-other' %>">
+                <%= r.result %>
+              </span>
+            </td>
+            <td>
+              <div class="actions">
+                <a href="/admin/edit-result/<%= r._id %>" class="btn-edit">✏️ Edit</a>
+                <form method="POST" action="/admin/delete-result/<%= r._id %>" style="display:inline;" onsubmit="return confirm('Delete result for <%= r.studentName %>? This cannot be undone.')">
+                  <button type="submit" class="btn-delete">🗑️ Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      <div class="count">Total: <%= results.length %> result(s)</div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+function filterTable() {
+  const input = document.getElementById('searchInput').value.toLowerCase();
+  const rows = document.querySelectorAll('#resultsTable tbody tr');
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(input) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
